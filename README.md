@@ -8,8 +8,8 @@
 - Name: Joshua Andrada
 - Email: AndradaJ@csu.fullerton.edu
 
-- Name: name
-- Email: email
+- Name: Reece Bailey
+- Email: Reece.bailey8857@yahoo.com
 
 **Extra Credit:**
 
