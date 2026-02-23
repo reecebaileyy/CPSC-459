@@ -1,5 +1,16 @@
-# CPSC-459
+# CPSC 459-01 - Project 1: ScroogeCoin
 
-Projects for our Blockchain Course at CSUF, saving the chain one block at a time. 
+**Group**
 
-Star for TBH and Rate <3 
+- Name: Christian Huerta
+- Email: christianhuerta@csu.fullerton.edu
+
+- Name: name
+- Email: email
+
+- Name: name
+- Email: email
+
+**Extra Credit:**
+
+- Yes added MaxFeeTxHandler.java
