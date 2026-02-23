@@ -5,8 +5,8 @@
 - Name: Christian Huerta
 - Email: christianhuerta@csu.fullerton.edu
 
-- Name: name
-- Email: email
+- Name: Joshua Andrada
+- Email: AndradaJ@csu.fullerton.edu
 
 - Name: name
 - Email: email
