@@ -130,7 +130,7 @@ public class TxHandler {
                         utxoPool.removeUTXO(spent);
                     }
 
-                    // now get the outputs and put them into the pull
+                    // now get the outputs and put them into the pool
                     byte[] transactionHash = tx.getHash();
                     for (int j = 0; j < tx.numOutputs(); j++) {
                         UTXO newUTXO = new UTXO(transactionHash, j);
