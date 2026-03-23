@@ -13,5 +13,4 @@
 
 **Extra Credit:**
 
-- Completed :D
-- Implemented CompliantNode.java
+- did not implement
