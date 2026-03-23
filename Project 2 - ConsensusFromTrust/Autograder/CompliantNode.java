@@ -1,49 +1,91 @@
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 public class CompliantNode implements Node {
 
-    // List of bools so we can keep track of who we follow, you only want to follow trusted transaction
     private boolean[] followees;
-    // every transaction id is so they can be returned
-    private HashSet<Integer> transactionsID;
+    private int numFollowees;
+    private final int numRounds;
+    private int proposalCalls;
+    private boolean receivedInPriorRound;
+
+    /** All transaction IDs we gossip during simulation rounds. */
+    private final HashSet<Integer> pending;
+
+    /** IDs that had strict majority among followees in the latest receiveCandidates (final output). */
+    private final HashSet<Integer> lastRoundConsensus;
 
     public CompliantNode(double p_graph, double p_malicious, double p_txDistribution, int numRounds) {
-        this.transactionsID = new HashSet<Integer>();
+        this.numRounds = numRounds;
+        this.pending = new HashSet<Integer>();
+        this.lastRoundConsensus = new HashSet<Integer>();
     }
 
     public void setFollowees(boolean[] followees) {
-        // initial followess added
         this.followees = followees;
+        this.numFollowees = 0;
+        for (boolean f : followees) {
+            if (f) {
+                numFollowees++;
+            }
+        }
     }
 
     public void setPendingTransaction(Set<Transaction> pendingTransactions) {
-        // start by getting every pending transaction and adding it to the transactionsID list
         for (Transaction tx : pendingTransactions) {
-            transactionsID.add(tx.id);
+            pending.add(tx.id);
         }
     }
 
     public Set<Transaction> getProposals() {
-        // Get every id in the transactionsID set and return them
-        HashSet<Transaction> ids = new HashSet<Transaction>();
-        for (int id : transactionsID) {
-            ids.add(new Transaction(id));
+        if (proposalCalls > 0 && proposalCalls < numRounds && !receivedInPriorRound) {
+            lastRoundConsensus.clear();
         }
-        return ids;
+        proposalCalls++;
+        HashSet<Transaction> out = new HashSet<Transaction>();
+        if (proposalCalls > numRounds) {
+            for (int id : lastRoundConsensus) {
+                out.add(new Transaction(id));
+            }
+            return out;
+        }
+        for (int id : pending) {
+            out.add(new Transaction(id));
+        }
+        receivedInPriorRound = false;
+        return out;
     }
 
     public void receiveCandidates(ArrayList<Integer[]> candidates) {
+        receivedInPriorRound = true;
+        lastRoundConsensus.clear();
+
+        if (numFollowees == 0) {
+            lastRoundConsensus.addAll(pending);
+            return;
+        }
+
+        HashMap<Integer, HashSet<Integer>> txToSenders = new HashMap<Integer, HashSet<Integer>>();
         for (Integer[] candidate : candidates) {
             int id = candidate[0];
             int whoSent = candidate[1];
-            // make sure whoever sent it is in the followees list by checking if its false or true
-            if (!followees[whoSent]){
+            if (!followees[whoSent]) {
                 continue;
             }
-            // add the id of the candidate to the transactionsID set if its trusted so it can be returned
-            transactionsID.add(id);
+            pending.add(id);
+            if (!txToSenders.containsKey(id)) {
+                txToSenders.put(id, new HashSet<Integer>());
+            }
+            txToSenders.get(id).add(whoSent);
+        }
+
+        for (Map.Entry<Integer, HashSet<Integer>> e : txToSenders.entrySet()) {
+            if (e.getValue().size() * 2 > numFollowees) {
+                lastRoundConsensus.add(e.getKey());
+            }
         }
     }
 }
